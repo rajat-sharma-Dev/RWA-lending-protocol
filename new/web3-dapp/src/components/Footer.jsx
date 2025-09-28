@@ -6,8 +6,8 @@ const Footer = () => {
   };
 
   return (
-    <footer className="relative overflow-hidden border-t border-border-primary">
-      <div className="container py-16">
+    <footer className="relative overflow-hidden border-t border-border-primary rounded-t-3xl bg-bg-card/80 shadow-2xl backdrop-blur-md mt-16">
+      <div className="container py-16 rounded-xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand Section */}
           <div className="animate-fade-in">

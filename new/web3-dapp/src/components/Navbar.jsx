@@ -14,13 +14,13 @@ const Navbar = () => {
   ]
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-border-primary">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-border-primary w-full rounded-b-3xl">
+      <div className="flex items-center justify-between px-8 py-4 w-full max-w-full rounded-full bg-bg-card/80 shadow-xl backdrop-blur-md">
         {/* Logo Section */}
         <div className="flex items-center space-x-4 animate-fade-in">
           <div className="relative group">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center hover-glow transition-all duration-300">
-              <Zap className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center hover-glow transition-all duration-300">
+              <Zap className="w-6 h-6 text-white" />
             </div>
           </div>
           <div>
@@ -32,15 +32,14 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-2">
+        <nav className="hidden md:flex items-center space-x-3 ml-8 flex-1">
           {navItems.map((item) => (
             <NavLink
               key={item.name}
               to={item.path}
               className={({ isActive }) =>
-                `nav-link relative px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                `nav-link relative px-6 py-3 rounded-full font-medium transition-all duration-300 ${
                   isActive 
                     ? 'text-accent-primary bg-accent-primary/10 border border-accent-primary/20' 
                     : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
@@ -51,50 +50,37 @@ const Navbar = () => {
             </NavLink>
           ))}
         </nav>
-
-        {/* Wallet Connection & Mobile Menu */}
-        <div className="flex items-center space-x-4">
-          {/* Professional Connect Button Wrapper */}
-          <div className="relative">
-            <ConnectButton showBalance={false} />
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-lg bg-bg-card border border-border-primary hover:border-border-accent transition-colors"
-          >
-            {isMenuOpen ? (
-              <X className="w-5 h-5 text-text-primary" />
-            ) : (
-              <Menu className="w-5 h-5 text-text-primary" />
-            )}
-          </button>
+        {/* Connect Button */}
+        <div className="ml-auto flex items-center gap-4">
+          <ConnectButton showBalance={false} chainStatus="icon" />
         </div>
+        {/* Mobile Menu Button */}
+        <button className="md:hidden ml-4 p-2 rounded-full bg-bg-elevated border border-border-primary" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
       </div>
-
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden glass-strong border-b border-border-primary animate-fade-in">
-          <div className="max-w-7xl mx-auto px-6 py-4 space-y-2">
+        <nav className="md:hidden bg-bg-card border-t border-border-primary px-8 py-4 w-full rounded-b-3xl">
+          <div className="flex flex-col gap-2">
             {navItems.map((item) => (
               <NavLink
                 key={item.name}
                 to={item.path}
-                onClick={() => setIsMenuOpen(false)}
                 className={({ isActive }) =>
-                  `nav-link block px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                  `nav-link px-5 py-3 rounded-full font-medium transition-all duration-300 ${
                     isActive 
                       ? 'text-accent-primary bg-accent-primary/10 border border-accent-primary/20' 
                       : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
                   }`
                 }
+                onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
               </NavLink>
             ))}
           </div>
-        </div>
+        </nav>
       )}
     </header>
   )

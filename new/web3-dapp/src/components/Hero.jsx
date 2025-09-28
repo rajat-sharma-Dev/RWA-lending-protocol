@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, Zap, Shield, TrendingUp } from 'lucide-react'
 import { useAccount, useReadContract } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import RegistrationCard from './RegistrationCard'
@@ -12,29 +11,16 @@ const Hero = () => {
   const [showRegistrationCard, setShowRegistrationCard] = useState(false)
   const navigate = useNavigate()
   
-  const { address, isConnected } = useAccount()
+  const { address } = useAccount()
 
   // Check if user is registered
-  const { data: isRegistered, refetch: refetchRegistration } = useReadContract({
+  const { refetch: refetchRegistration } = useReadContract({
     address: USER_REGISTRY_ADDRESS,
     abi: UserRegistryABI.abi,
     functionName: 'isRegistered',
     args: [address],
     enabled: !!address,
   })
-
-  const handleLaunchApp = () => {
-    if (!isConnected) {
-      // Will be handled by ConnectButton
-      return
-    }
-    
-    if (isRegistered) {
-      navigate('/dashboard')
-    } else {
-      setShowRegistrationCard(true)
-    }
-  }
 
   const handleRegistrationComplete = () => {
     refetchRegistration()
@@ -44,154 +30,50 @@ const Hero = () => {
   }
 
   return (
-    <section className="min-h-screen relative flex items-center justify-center overflow-hidden pt-20">
-      {/* Subtle Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-bg-primary via-bg-secondary to-bg-primary"></div>
-      
-      {/* Professional grid pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="grid grid-cols-12 gap-4 h-full">
-          {Array.from({ length: 48 }).map((_, i) => (
-            <div key={i} className="border-r border-border-primary"></div>
-          ))}
+    <section className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-bg-primary via-bg-secondary to-bg-primary px-4 py-24">
+      <div className="max-w-2xl w-full mx-auto text-center glass-strong rounded-3xl border border-border-primary shadow-2xl p-10">
+        <h1 className="text-4xl md:text-5xl font-display font-bold mb-6 gradient-text">RWA Collateralized Lending Platform</h1>
+        <p className="text-lg text-text-secondary mb-4">Borrow against real-world assets (RWA) with instant liquidity, transparent rates, and on-chain auto-liquidation. Secure, decentralized, and accessible to all.</p>
+        <ul className="text-text-primary text-base mb-8 space-y-2">
+          <li>• RWA-backed loans (real estate, commodities, bonds)</li>
+          <li>• Automated liquidation for undercollateralized positions</li>
+          <li>• Transparent, on-chain lending and borrowing</li>
+        </ul>
+        <div className="flex flex-col items-center gap-4 mb-8">
+          <ConnectButton showBalance={false} chainStatus="icon" className="rounded-full px-6 py-3 bg-gradient-to-br from-accent-primary to-accent-secondary shadow-lg" />
         </div>
       </div>
-
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center">
-          {/* Professional Badge */}
-          <div className="inline-flex items-center px-4 py-2 badge-primary mb-8 animate-fade-in">
-            <Zap className="w-4 h-4 mr-2" />
-            <span className="text-sm font-medium">Professional DeFi Protocol</span>
+      {/* Use Cases Section */}
+      <div className="max-w-3xl w-full mx-auto mt-16 text-center">
+        <h2 className="text-2xl font-bold mb-4 gradient-text">Use Cases</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-bg-card glass-strong rounded-2xl p-6 border border-border-primary">
+            <div className="font-semibold mb-2">Real Estate Liquidity</div>
+            <div className="text-text-secondary text-sm">Unlock cash from property NFTs without selling your asset.</div>
           </div>
-
-          {/* Main Heading */}
-          <h1 className="text-5xl md:text-7xl font-display font-bold mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            The Future of{' '}
-            <span className="gradient-text">Real World Assets</span>
-          </h1>
-
-          {/* Subheading */}
-          <p className="text-xl md:text-2xl text-text-secondary max-w-4xl mx-auto mb-12 leading-relaxed animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            Bridge traditional finance with decentralized protocols. Unlock liquidity from real estate, 
-            commodities, and bonds through our revolutionary tokenization platform.
-          </p>
-
-          {/* Feature Pills */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            {[
-              { icon: Shield, text: "Bank-Grade Security" },
-              { icon: Zap, text: "Instant Settlements" },
-              { icon: TrendingUp, text: "Competitive Returns" }
-            ].map((feature) => (
-              <div key={feature.text} className="flex items-center gap-2 bg-bg-card border border-border-primary px-4 py-2 rounded-full">
-                <feature.icon className="w-4 h-4 text-accent-primary" />
-                <span className="text-sm text-text-primary">{feature.text}</span>
-              </div>
-            ))}
+          <div className="bg-bg-card glass-strong rounded-2xl p-6 border border-border-primary">
+            <div className="font-semibold mb-2">SME Financing</div>
+            <div className="text-text-secondary text-sm">Small businesses can borrow against tokenized invoices or inventory.</div>
           </div>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16 animate-fade-in" style={{ animationDelay: '0.8s' }}>
-            {!isConnected ? (
-              <ConnectButton.Custom>
-                {({
-                  account,
-                  chain,
-                  openConnectModal,
-                  authenticationStatus,
-                  mounted,
-                }) => {
-                  const ready = mounted && authenticationStatus !== 'loading'
-                  const connected =
-                    ready &&
-                    account &&
-                    chain &&
-                    (!authenticationStatus ||
-                      authenticationStatus === 'authenticated')
-
-                  return (
-                    <div
-                      {...(!ready && {
-                        'aria-hidden': true,
-                        'style': {
-                          opacity: 0,
-                          pointerEvents: 'none',
-                          userSelect: 'none',
-                        },
-                      })}
-                    >
-                      {(() => {
-                        if (!connected) {
-                          return (
-                            <button 
-                              onClick={openConnectModal} 
-                              className="btn-primary group px-8 py-4 text-lg font-semibold rounded-lg"
-                            >
-                              <div className="flex items-center gap-3">
-                                <span>Connect Wallet</span>
-                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                              </div>
-                            </button>
-                          )
-                        }
-
-                        return (
-                          <button
-                            onClick={handleLaunchApp}
-                            className="btn-primary group px-8 py-4 text-lg font-semibold rounded-lg"
-                          >
-                            <div className="flex items-center gap-3">
-                              <span>Launch App</span>
-                              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                            </div>
-                          </button>
-                        )
-                      })()}
-                    </div>
-                  )
-                }}
-              </ConnectButton.Custom>
-            ) : (
-              <button
-                onClick={handleLaunchApp}
-                className="btn-primary group px-8 py-4 text-lg font-semibold rounded-lg"
-              >
-                <div className="flex items-center gap-3">
-                  <span>Launch App</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                </div>
-              </button>
-            )}
-
-            <button className="btn-secondary px-8 py-4 text-lg font-semibold rounded-lg">
-              <span>View Documentation</span>
-            </button>
-          </div>
-
-          {/* Stats Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '1s' }}>
-            {[
-              { label: "Total Value Locked", value: "$2.1B+", change: "+24%" },
-              { label: "Assets Tokenized", value: "1,250+", change: "+156%" },
-              { label: "Active Users", value: "150K+", change: "+89%" }
-            ].map((stat) => (
-              <div key={stat.label} className="card p-6">
-                <div className="text-3xl font-display font-bold gradient-text mb-2">{stat.value}</div>
-                <div className="text-sm text-text-secondary mb-2">{stat.label}</div>
-                <div className="text-xs text-accent-success font-medium">{stat.change} this month</div>
-              </div>
-            ))}
+          <div className="bg-bg-card glass-strong rounded-2xl p-6 border border-border-primary">
+            <div className="font-semibold mb-2">Commodities & Bonds</div>
+            <div className="text-text-secondary text-sm">Access liquidity using tokenized gold, oil, or government bonds as collateral.</div>
           </div>
         </div>
       </div>
-
-      {/* Registration Card Modal */}
-      <RegistrationCard
-        isOpen={showRegistrationCard}
-        onClose={() => setShowRegistrationCard(false)}
-        onRegistered={handleRegistrationComplete}
-      />
+      {/* How-To Guide Section */}
+      <div className="max-w-3xl w-full mx-auto mt-16 text-center">
+        <h2 className="text-2xl font-bold mb-4 gradient-text">How to Use</h2>
+        <ol className="list-decimal list-inside text-text-primary text-base space-y-2 text-left mx-auto max-w-xl">
+          <li>Connect your wallet to the platform.</li>
+          <li>Register and verify your account (if new).</li>
+          <li>Mint or deposit your RWA NFT or tokenized asset.</li>
+          <li>Borrow stablecoins against your collateral instantly.</li>
+          <li>Repay your loan or let the protocol auto-liquidate if undercollateralized.</li>
+        </ol>
+      </div>
+      {/* Registration Modal */}
+      <RegistrationCard isOpen={showRegistrationCard} onClose={() => setShowRegistrationCard(false)} onRegistered={handleRegistrationComplete} />
     </section>
   )
 }

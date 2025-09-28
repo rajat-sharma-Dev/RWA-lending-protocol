@@ -10,7 +10,6 @@ const RWA_GEM_NFT_ADDRESS = '0x1841dab473e9a731efda381374311ad2d48b161a';
 
 const Borrow = () => {
   const { address, isConnected } = useAccount();
-
   // State for Request Loan form
   const [collateralId, setCollateralId] = useState('');
   const [loanAmount, setLoanAmount] = useState('');
@@ -18,7 +17,6 @@ const Borrow = () => {
   const [loanStatus, setLoanStatus] = useState('idle');
   const [loanError, setLoanError] = useState('');
   const [loanTxHash, setLoanTxHash] = useState(null);
-
   // State for Mint NFT form
   const [assetType, setAssetType] = useState('');
   const [weight, setWeight] = useState('');
@@ -30,33 +28,23 @@ const Borrow = () => {
   const [mintStatus, setMintStatus] = useState('idle');
   const [mintError, setMintError] = useState('');
   const [mintTxHash, setMintTxHash] = useState(null);
-
   const { writeContract: writeLoan, isPending: isLoanPending, error: loanTxError } = useWriteContract();
   const { writeContract: writeMint } = useWriteContract();
-
   // Wait for transaction confirmation
   const { isLoading: isConfirming, isSuccess: isConfirmed, isError: isTxError, error: txError } = useWaitForTransactionReceipt({
     hash: loanTxHash,
     enabled: !!loanTxHash,
   });
-
   // Only one borrowing option: NFT as collateral
   const borrowingOption = {
     id: 1,
     collateral: 'RWA NFT',
-    borrowAsset: 'USDC',
+    borrowAsset: 'rBTC (mock)',
     description: 'Borrow against tokenized real estate (NFT as collateral)',
   };
-
   const [showLoanForm, setShowLoanForm] = useState(false);
-
-  const openLoanForm = () => {
-    setShowLoanForm(true);
-  };
-  const closeLoanForm = () => {
-    setShowLoanForm(false);
-  };
-
+  const openLoanForm = () => setShowLoanForm(true);
+  const closeLoanForm = () => setShowLoanForm(false);
   // Request Loan handler
   const handleRequestLoan = async (e) => {
     e.preventDefault();
@@ -78,7 +66,6 @@ const Borrow = () => {
           Number(loanAmount),
           Number(duration)
         ],
-        // onSuccess will be called with the transaction hash
         onSuccess: (txHash) => {
           setLoanTxHash(txHash);
         },
@@ -92,7 +79,6 @@ const Borrow = () => {
       setLoanError(err?.message || 'Transaction failed');
     }
   };
-
   // React to transaction confirmation
   useEffect(() => {
     if (isConfirming) setLoanStatus('pending');
@@ -102,7 +88,6 @@ const Borrow = () => {
       setLoanError(txError?.message || 'Transaction failed');
     }
   }, [isConfirming, isConfirmed, isTxError, txError]);
-
   // Mint NFT handler
   const handleMintAsset = async (e) => {
     e.preventDefault();
@@ -120,8 +105,8 @@ const Borrow = () => {
         abi: RwaGemNFTABI,
         functionName: 'mintAsset',
         args: [
-          address, // user's own address as recipient
-          Number(assetType), // enum index: 0=DIAMOND, 1=GOLD, 2=SILVER, 3=OTHER_GEMS
+          address,
+          Number(assetType),
           Number(weight),
           Number(purity),
           certificate,
@@ -142,13 +127,11 @@ const Borrow = () => {
       setMintError(err.message || 'Transaction failed');
     }
   };
-
   // Wait for mint transaction confirmation
   const { isLoading: isMintingConfirming, isSuccess: isMintingConfirmed, isError: isMintTxError, error: mintTxError } = useWaitForTransactionReceipt({
     hash: mintTxHash,
     enabled: !!mintTxHash,
   });
-
   useEffect(() => {
     if (isMintingConfirming) setMintStatus('pending');
     if (isMintingConfirmed) setMintStatus('success');
@@ -157,15 +140,17 @@ const Borrow = () => {
       setMintError(mintTxError?.message || 'Transaction failed');
     }
   }, [isMintingConfirming, isMintingConfirmed, isMintTxError, mintTxError]);
-
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary pt-20">
-      <div className="max-w-2xl mx-auto px-6 py-8">
-        <h1 className="text-3xl font-bold mb-6">Borrow Page</h1>
+    <section className="min-h-screen bg-gradient-to-br from-bg-primary via-bg-secondary to-bg-primary text-text-primary pt-20 flex flex-col items-center justify-center px-4 py-12">
+      <div className="w-full max-w-2xl mx-auto flex flex-col gap-10">
+        {/* Protocol Title */}
+        <div className="flex justify-center mb-6">
+          <span className="text-3xl font-display font-bold gradient-text">LENDAURA</span>
+        </div>
         {/* Borrowing Option: NFT as Collateral */}
-        <div className="card p-6 flex flex-col gap-4 mb-8">
+        <div className="glass-strong rounded-3xl border border-border-primary shadow-2xl p-8 flex flex-col gap-4 mb-8 bg-bg-card">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-accent-primary to-accent-secondary rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-accent-primary to-accent-secondary rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-sm">{borrowingOption.collateral.slice(0, 2)}</span>
             </div>
             <div>
@@ -174,7 +159,7 @@ const Borrow = () => {
             </div>
           </div>
           <button
-            className="btn-primary w-full"
+            className="btn-primary w-full rounded-full py-3 text-lg font-semibold"
             onClick={openLoanForm}
           >
             Borrow {borrowingOption.borrowAsset}
@@ -182,24 +167,24 @@ const Borrow = () => {
         </div>
         {/* Loan Form Modal/Inline */}
         {showLoanForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-bg-primary rounded-lg shadow-lg p-6 w-full max-w-md relative">
-              <button className="absolute top-2 right-2 text-xl" onClick={closeLoanForm}>&times;</button>
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-bg-card rounded-3xl shadow-2xl p-8 w-full max-w-md relative border border-border-primary">
+              <button className="absolute top-2 right-2 text-2xl text-text-secondary hover:text-accent-primary" onClick={closeLoanForm}>&times;</button>
               <h2 className="text-xl font-semibold mb-4">Request Loan (RWA NFT as Collateral)</h2>
               <form onSubmit={handleRequestLoan} className="space-y-4">
                 <div>
                   <label className="block mb-1 font-medium">Collateral ID</label>
-                  <input type="text" className="input" value={collateralId} onChange={e => setCollateralId(e.target.value)} required />
+                  <input type="text" className="w-full px-6 py-3 rounded-full bg-bg-elevated border border-border-primary text-text-primary text-lg" value={collateralId} onChange={e => setCollateralId(e.target.value)} required />
                 </div>
                 <div>
                   <label className="block mb-1 font-medium">Loan Amount</label>
-                  <input type="number" className="input" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} required />
+                  <input type="number" className="w-full px-6 py-3 rounded-full bg-bg-elevated border border-border-primary text-text-primary text-lg" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} required />
                 </div>
                 <div>
                   <label className="block mb-1 font-medium">Duration (seconds)</label>
-                  <input type="number" className="input" value={duration} onChange={e => setDuration(e.target.value)} required />
+                  <input type="number" className="w-full px-6 py-3 rounded-full bg-bg-elevated border border-border-primary text-text-primary text-lg" value={duration} onChange={e => setDuration(e.target.value)} required />
                 </div>
-                <button type="submit" className="btn-primary w-full" disabled={loanStatus === 'pending' || isLoanPending || isConfirming}>
+                <button type="submit" className="btn-primary w-full rounded-full py-3 text-lg font-semibold" disabled={loanStatus === 'pending' || isLoanPending || isConfirming}>
                   {loanStatus === 'pending' || isLoanPending || isConfirming ? 'Requesting...' : 'Request Loan'}
                 </button>
                 {loanStatus === 'success' && <div className="text-green-600 mt-2">Loan requested successfully!<br/>Tx: {loanTxHash && <a href={`https://etherscan.io/tx/${loanTxHash}`} target="_blank" rel="noopener noreferrer" className="underline">View on Etherscan</a>}</div>}
@@ -209,16 +194,16 @@ const Borrow = () => {
           </div>
         )}
         {/* Mint NFT Form */}
-        <div className="card p-6 mb-8">
+        <div className="glass-strong rounded-3xl border border-border-primary shadow-2xl p-8 bg-bg-card">
           <h2 className="text-xl font-semibold mb-4">Tokenize Asset (Mint NFT)</h2>
           <form onSubmit={handleMintAsset} className="space-y-4">
             <div>
               <label className="block mb-1 font-medium">Recipient Address</label>
-              <input type="text" className="input" value={address} disabled />
+              <input type="text" className="w-full px-6 py-3 rounded-full bg-bg-elevated border border-border-primary text-text-primary text-lg" value={address} disabled />
             </div>
             <div>
               <label className="block mb-1 font-medium">Asset Type</label>
-              <select className="input" value={assetType} onChange={e => setAssetType(e.target.value)} required>
+              <select className="w-full px-6 py-3 rounded-full bg-bg-elevated border border-border-primary text-text-primary text-lg" value={assetType} onChange={e => setAssetType(e.target.value)} required>
                 <option value="">Select Asset Type</option>
                 <option value="0">DIAMOND</option>
                 <option value="1">GOLD</option>
@@ -228,29 +213,29 @@ const Borrow = () => {
             </div>
             <div>
               <label className="block mb-1 font-medium">Weight</label>
-              <input type="number" className="input" value={weight} onChange={e => setWeight(e.target.value)} required />
+              <input type="number" className="w-full px-6 py-3 rounded-full bg-bg-elevated border border-border-primary text-text-primary text-lg" value={weight} onChange={e => setWeight(e.target.value)} required />
             </div>
             <div>
               <label className="block mb-1 font-medium">Purity</label>
-              <input type="number" className="input" value={purity} onChange={e => setPurity(e.target.value)} required />
+              <input type="number" className="w-full px-6 py-3 rounded-full bg-bg-elevated border border-border-primary text-text-primary text-lg" value={purity} onChange={e => setPurity(e.target.value)} required />
             </div>
             <div>
               <label className="block mb-1 font-medium">Certificate</label>
-              <input type="text" className="input" value={certificate} onChange={e => setCertificate(e.target.value)} required />
+              <input type="text" className="w-full px-6 py-3 rounded-full bg-bg-elevated border border-border-primary text-text-primary text-lg" value={certificate} onChange={e => setCertificate(e.target.value)} required />
             </div>
             <div>
               <label className="block mb-1 font-medium">Physical Attributes (JSON)</label>
-              <input type="text" className="input" value={physicalAttributes} onChange={e => setPhysicalAttributes(e.target.value)} required />
+              <input type="text" className="w-full px-6 py-3 rounded-full bg-bg-elevated border border-border-primary text-text-primary text-lg" value={physicalAttributes} onChange={e => setPhysicalAttributes(e.target.value)} required />
             </div>
             <div>
               <label className="block mb-1 font-medium">Asset Document Hash (hex string, 0x...)</label>
-              <input type="text" className="input" value={assetDocumentHash} onChange={e => setAssetDocumentHash(e.target.value)} required />
+              <input type="text" className="w-full px-6 py-3 rounded-full bg-bg-elevated border border-border-primary text-text-primary text-lg" value={assetDocumentHash} onChange={e => setAssetDocumentHash(e.target.value)} required />
             </div>
             <div>
               <label className="block mb-1 font-medium">Metadata URI</label>
-              <input type="text" className="input" value={metadataURI} onChange={e => setMetadataURI(e.target.value)} required />
+              <input type="text" className="w-full px-6 py-3 rounded-full bg-bg-elevated border border-border-primary text-text-primary text-lg" value={metadataURI} onChange={e => setMetadataURI(e.target.value)} required />
             </div>
-            <button type="submit" className="btn-primary w-full" disabled={mintStatus === 'pending' || isMintingConfirming}>
+            <button type="submit" className="btn-primary w-full rounded-full py-3 text-lg font-semibold" disabled={mintStatus === 'pending' || isMintingConfirming}>
               {mintStatus === 'pending' || isMintingConfirming ? 'Minting...' : 'Mint NFT'}
             </button>
             {mintStatus === 'success' && <div className="text-green-600 mt-2">NFT minted successfully!<br/>Tx: {mintTxHash && <a href={`https://etherscan.io/tx/${mintTxHash}`} target="_blank" rel="noopener noreferrer" className="underline">View on Etherscan</a>}</div>}
@@ -258,7 +243,7 @@ const Borrow = () => {
           </form>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
