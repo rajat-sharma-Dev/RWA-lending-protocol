@@ -1,5 +1,8 @@
 import { Zap } from 'lucide-react'
 
+// USER_REGISTRY_ADDRESS for reference:
+// const USER_REGISTRY_ADDRESS = '0xaFD02073a5E35163c448B7Da967474b04f7c062E'
+
 const Dashboard = () => {
   return (
     <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-bg-primary via-bg-secondary to-bg-primary px-4 py-24">

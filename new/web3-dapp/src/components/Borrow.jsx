@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { attestRWA } from '../../attestRWA';
 import GemLoanVault from '../abis/GemLoanVault.json';
 import RwaGemNFT from '../abis/RwaGemNFT.json';
 const GemLoanVaultABI = GemLoanVault.abi;
@@ -128,13 +129,20 @@ const Borrow = () => {
     }
   };
   // Wait for mint transaction confirmation
+  const assetTypeLabels = ['DIAMOND', 'GOLD', 'SILVER', 'OTHER_GEMS'];
   const { isLoading: isMintingConfirming, isSuccess: isMintingConfirmed, isError: isMintTxError, error: mintTxError } = useWaitForTransactionReceipt({
     hash: mintTxHash,
     enabled: !!mintTxHash,
   });
   useEffect(() => {
     if (isMintingConfirming) setMintStatus('pending');
-    if (isMintingConfirmed) setMintStatus('success');
+    if (isMintingConfirmed) {
+      setMintStatus('success');
+      // Call attestation after successful mint
+      const assetLabel = assetTypeLabels[Number(assetType)] || assetType;
+      const vow = `I have tokenized my RWA to an NFT (${assetLabel})`;
+      attestRWA(assetLabel, vow).catch(console.error);
+    }
     if (isMintTxError) {
       setMintStatus('error');
       setMintError(mintTxError?.message || 'Transaction failed');
