@@ -1,6 +1,6 @@
-# 🏛️ [Protocol Name] - Decentralized RWA Lending Protocol
+# 🏛️ Decentralized RWA Lending Protocol
 
-**[Protocol Name]** is an innovative decentralized lending protocol that bridges the gap between traditional finance and decentralized finance (DeFi) by utilizing **Real World Assets (RWAs)** as collateral. This repository contains all components of the protocol: the **Smart Contracts** that power the core logic and the **Frontend** web application for user interaction.
+RWA Lending Protocol is an innovative decentralized lending protocol that bridges the gap between traditional finance and decentralized finance (DeFi) by utilizing **Real World Assets (RWAs)** as collateral. This repository contains all components of the protocol: the **Smart Contracts** that power the core logic and the **Frontend** web application for user interaction.
 
 ---
 
